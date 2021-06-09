@@ -15,7 +15,7 @@ const Options = () => {
   const synchronizeDataSaved = () => {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get("RArules", (data: any) => {
-        resolve(data.RArules);
+        resolve(data?.RArules??[]);
       });
     });    
   }
