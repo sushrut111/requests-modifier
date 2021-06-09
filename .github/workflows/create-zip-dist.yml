@@ -1,0 +1,36 @@
+name: build-package
+on:
+  release:
+    types: [published]
+jobs:
+  pack-and-upload-crx-to-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: Get release information
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - run: npm install -g bestzip
+      - name: Initialize and setup
+        run: npm install
+      - name: Build the extension
+        run: npm run build
+      - name: Pack zip file
+        env:
+          RELEASE_VERSION: requests-modifier-${{ steps.vars.outputs.tag }}.zip
+        run: cd dist && bestzip ../$RELEASE_VERSION *
+      - name: Upload release binary
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ../requests-modifier-${{ steps.vars.outputs.tag }}.zip
+          asset_name: requests-modifier-${{ steps.vars.outputs.tag }}.zip
+          asset_content_type: application/zip
