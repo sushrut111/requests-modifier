@@ -24,7 +24,7 @@ jobs:
       - name: Pack zip file
         env:
           RELEASE_VERSION: requests-modifier-${{ steps.vars.outputs.tag }}.zip
-        run: cd dist && bestzip $RELEASE_VERSION *
+        run: cd dist && bestzip ../$RELEASE_VERSION *
       - name: check build
         run: ls -a
       - name: Upload release binary
@@ -33,6 +33,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ../requests-modifier-${{ steps.vars.outputs.tag }}.zip
+          asset_path: requests-modifier-${{ steps.vars.outputs.tag }}.zip
           asset_name: requests-modifier-${{ steps.vars.outputs.tag }}.zip
           asset_content_type: application/zip
