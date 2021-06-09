@@ -3,7 +3,7 @@ on:
   release:
     types: [published]
 jobs:
-  pack-and-upload-crx-to-release:
+  pack-and-upload-zip-to-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,6 +25,8 @@ jobs:
         env:
           RELEASE_VERSION: requests-modifier-${{ steps.vars.outputs.tag }}.zip
         run: cd dist && bestzip $RELEASE_VERSION *
+      - name: check build
+        run: ls -a
       - name: Upload release binary
         uses: actions/upload-release-asset@v1.0.2
         env:
