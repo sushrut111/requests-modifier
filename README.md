@@ -12,7 +12,7 @@ npm run watch
 ```
 
 - Add the `./dist` directory to chrome
-    - Head to `[chrome://extensions](chrome://extensions)`
+    - Head to [chrome://extensions](chrome://extensions)
     - Load unpacked
     - Open options by clicking Extension's icon in toolbar
 
