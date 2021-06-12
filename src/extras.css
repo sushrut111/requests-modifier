@@ -1,0 +1,6 @@
+.wrappedHidden {
+    display:inline-block;
+    width:500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

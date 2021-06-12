@@ -1,11 +1,11 @@
 import React, { isValidElement, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { Container, Table, InputGroup, DropdownButton, Dropdown, FormControl, Button, Tab, Alert } from "react-bootstrap";
+import { Container, Table, InputGroup, DropdownButton, Dropdown, FormControl, Button, Tab, Alert, FormCheck } from "react-bootstrap";
 import { EventKey } from "react-bootstrap/esm/types";
 import * as _ from "lodash";
 import {Rule, ruleSchemeTypes} from "./Rule";
 import {Tester} from "./regexTester";
-
+import "./extras.css";
 interface AllStore {
   RArules: Rule[]
 }
@@ -115,6 +115,24 @@ const Options = () => {
     setRules([...tempRules]);
   }
 
+  const toggleChecked = (rule: Rule) => {
+    const tempRules = rules.map(
+      _irule => {
+        if(_.isEqual(_irule, rule)) {
+          _irule.active = !_irule.active;
+          
+        }
+        return _irule;
+      }
+    );
+    setRules(tempRules);
+  }
+
+  const editRule = (rule: Rule) => {
+    setNewRule(rule);
+    removeRule(rule);
+  }
+
   return (
     <>
 <div>
@@ -133,6 +151,7 @@ const Options = () => {
         <li>In the next input field, you can either enter the url where you want the response to be fetched from or drag and drop the file to return the contents of that file as response.</li>
         <li>The last matched group will be appended to the redirected URL by default. If you do not want to append the last match, write your regular expression such that there are no match groups.</li>
         <li>Click on Add rule to save the rule.</li>
+        <li>You can edit the saved rule by clicking the edit button. This will delete the saved rule and the rule will be added to the edit session - that means you will <b>lose the rule</b> if you navigate away without saving it.</li>
       </ul>
     </Alert>
     <div>
@@ -185,9 +204,9 @@ const Options = () => {
                 <td>{index + 1}</td>
                 <td>{rule.scheme}</td>
                 <td>{rule.urlpattern}</td>
-                <td>{rule.target}</td>
-                <td>{rule.active}</td>
-                <td><Button size="sm" variant="danger" onClick={()=>{removeRule(rule)}}>Delete</Button></td>
+                <td className="wrappedHidden">{rule.target}</td>
+                <td><FormCheck type="checkbox" checked={rule.active} onChange={()=>toggleChecked(rule)}/></td>
+                <td><Button size="sm" variant="warning" onClick={()=>editRule(rule)} >Edit</Button><Button size="sm" variant="danger" onClick={()=>{removeRule(rule)}}>Delete</Button></td>
               </tr>
             )
           })
