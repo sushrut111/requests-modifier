@@ -3,12 +3,9 @@ import ReactDOM from "react-dom";
 import { Container, Table, InputGroup, DropdownButton, Dropdown, FormControl, Button, Tab, Alert, FormCheck } from "react-bootstrap";
 import { EventKey } from "react-bootstrap/esm/types";
 import * as _ from "lodash";
-import {Rule, ruleSchemeTypes} from "./Rule";
+import {Rule, ruleSchemeTypes, validateRule} from "./Rule";
 import {Tester} from "./regexTester";
 import "./extras.css";
-interface AllStore {
-  RArules: Rule[]
-}
 
 const Options = () => {
   const [rules, setRules] = useState<Rule[]>([]);
@@ -100,13 +97,34 @@ const Options = () => {
   const dragOverHandler = (e: any) => {
     e.preventDefault();
   }
+
+  const addNewRules = (newrules: Rule[]) => {
+    let validRules = newrules.filter((_irule)=>{
+      let validation = validateRule(_irule);
+      if(!validation.valid){
+        alert(validation.error);
+      }
+      return validation.valid;
+    })
+    setRules(_.unionWith(rules, validRules, _.isEqual));
+    return validRules.length === newrules.length;
+  }
+
   const saveRule = () => {
-    if(newRule.urlpattern.trim()==="" || newRule.target.trim()===""){
-      alert("Url patter or url target cannot be empty");
+    if(addNewRules([newRule])) clearNewRule();
+  }
+
+  const getJsonExportDataUrl = () => {
+    return "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(rules));
+  }
+
+  const openRuleTester = () => {
+    let validation = validateRule(newRule);
+    if(!validation.valid){
+      alert(validation.error);
       return;
     }
-    setRules(_.unionWith(rules, [newRule], _.isEqual));
-    clearNewRule();
+    setShowTester(!showTester);
   }
 
   const removeRule = (rule: Rule) => {
@@ -132,18 +150,38 @@ const Options = () => {
     setNewRule(rule);
     removeRule(rule);
   }
-
-  return (
-    <>
-<div>
-  <Tester
-    show={showTester}
-    onHide={() => setShowTester(false)}
-    rule={newRule}
-  ></Tester>
-  <Container>
-    <div style={{textAlign: "center"}}><h2>Autoresponder</h2></div>
-    <Alert variant="primary">
+  const loadFile = async(e: any) => {
+    if(e.target.files.length===0){
+      return;
+    }
+    let file: File = e.target.files[0];
+    if(!file.name.endsWith(".arjson")) {
+      alert("This is not a valid export from this extension.");
+      return;
+    }
+    let fileText = await file.text();
+    let fileRules;
+    try{
+      fileRules = JSON.parse(fileText);
+      if(fileRules.length===undefined){
+        throw new SyntaxError("The imported file does not seem to have rules in proper format exported by the extension.")
+      }
+    } catch(e) {
+      alert(`The imported file is corrupted: ${e.toString()}`);
+      return;
+    }
+    try{
+      if(!addNewRules(fileRules)){
+        throw new SyntaxError("One or more rules could not be imported from the file you uploaded. However, all the valid rules from the file have been succesfully imported.")
+      }
+    } catch (e) {
+      alert(e.toString());
+    }
+    
+  }
+  
+  const getInstructions = () => {
+    return <Alert variant="primary">
       <ul>
         <li>You can add and delete rules from autoresponder here.</li>
         <li>Select the match scheme for rule. Select EXACT to match the url exactly, select REGEX to enter a pattern.</li>
@@ -152,8 +190,40 @@ const Options = () => {
         <li>The last matched group will be appended to the redirected URL by default. If you do not want to append the last match, write your regular expression such that there are no match groups.</li>
         <li>Click on Add rule to save the rule.</li>
         <li>You can edit the saved rule by clicking the edit button. This will delete the saved rule and the rule will be added to the edit session - that means you will <b>lose the rule</b> if you navigate away without saving it.</li>
+        <li>You can export the rules by clicking the Export rules button below the table.</li>
+        <li>You can import the rules by clicking the Import rules button below the table and then selecting the .arjson file exported.</li>
       </ul>
     </Alert>
+  }
+
+  const getImportExportFunctionality = () => {
+    return <>
+      <Button variant="warning">
+        <label>
+          <input type="file" id="fileToLoad" onChange={loadFile} hidden/>
+          Import
+        </label>
+      </Button><br/>      
+      <a href={"data:" + getJsonExportDataUrl()} 
+      download="autoresponder.arjson">
+        <Button>Export</Button>
+      </a>
+    </>
+  }
+
+  const getRuleTesterModal = () => {
+    return <Tester
+    show={showTester}
+    onHide={() => setShowTester(false)}
+    rule={newRule}/>
+  }
+
+  return (
+    <>
+<div>
+  <Container>
+    {getRuleTesterModal()}
+    <div style={{textAlign: "center"}}><h2>Autoresponder</h2></div>
     <div>
       <InputGroup>
         <DropdownButton
@@ -178,7 +248,7 @@ const Options = () => {
           onDrop={handleFileDrop} 
           onDragOver={dragOverHandler}
         />
-        <Button onClick={()=>{setShowTester(!showTester)}} variant="warning">Test</Button>
+        <Button onClick={openRuleTester} variant="warning">Test</Button>
         <Button variant="primary" onClick={saveRule}>Add Rule</Button>
       </InputGroup>
       <hr/>
@@ -214,10 +284,9 @@ const Options = () => {
       </tbody>
     </Table>
       }
-      
-      
     </div>
-
+      {getImportExportFunctionality()}
+      {getInstructions()}
   </Container>
 </div>
     </>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Button, Container, FormControl, Modal, Table } from "react-bootstrap";
 import {getRedirectResponse, Rule} from "./Rule";
+import "./extras.css"
 interface TesterProps {
     show: boolean,
     onHide: ()=>void,
@@ -31,7 +32,7 @@ export const Tester = (props: TesterProps) => {
             <Alert variant="primary">
                 All requests to {testcase.testUrl}<br/>
                 will get their response from <br/>
-                <a href={testcase.responseUrl} target="_blank" >{testcase.responseUrl}</a>
+                <a href={testcase.responseUrl} target="_blank" className="wrappedHidden" >{testcase.responseUrl}</a>
             </Alert>
         )
     }
@@ -68,7 +69,7 @@ export const Tester = (props: TesterProps) => {
             <tbody>
                 <tr><td>Scheme</td><td>{props.rule.scheme}</td></tr>
                 <tr><td>Match pattern</td><td>{props.rule.urlpattern}</td></tr>
-                <tr><td>Target</td><td>{props.rule.target}</td></tr>
+                <tr><td>Target</td><td className="wrappedHidden">{props.rule.target}</td></tr>
             </tbody>
         </Table>
         <hr/>
