@@ -27,6 +27,7 @@ const actorFunction = async () => {
         if(!!!rules[i].active) continue;
         let thisrule = rules[i];
         let redirResp = getRedirectResponse(thisrule, requestDetails);
+        if(redirResp===undefined) continue;
         return redirResp;
       }
     },
