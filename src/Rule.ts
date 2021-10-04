@@ -14,7 +14,7 @@ export const validateRule = (rule: Rule) => {
   }
   // check for keys
   const requiredKeys = ["urlpattern", "target", "scheme", "active"];
-  for(let key of requiredKeys){
+  for(const key of requiredKeys){
     if(!(key in rule)){
       validation.error = `${key} not found in rule`;
       validation.valid = false;
