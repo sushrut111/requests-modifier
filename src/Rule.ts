@@ -50,6 +50,11 @@ export const validateRule = (rule: Rule) => {
 export const getRedirectResponse = (thisrule: Rule, requestDetails: {url: string}) => {
   if(thisrule.scheme === "EXACT"){
     if(thisrule.urlpattern===requestDetails.url){
+      if(thisrule.target === "BLOCK") {
+        return {
+          cancel: true
+        }
+      }
       return {
         redirectUrl: thisrule.target
       }  
@@ -57,6 +62,11 @@ export const getRedirectResponse = (thisrule: Rule, requestDetails: {url: string
   } else if(thisrule.scheme === "REGEX") {
     const regexp = new RegExp(`^${thisrule.urlpattern}$`);
     if(regexp.test(requestDetails.url)) {
+      if(thisrule.target === "BLOCK") {
+        return {
+          cancel: true
+        }
+      }
       const match = regexp.exec(requestDetails.url);
       return {
         redirectUrl: thisrule.target + (match.length>1?match[match.length-1]:"")
