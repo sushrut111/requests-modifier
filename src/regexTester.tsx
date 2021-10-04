@@ -39,12 +39,12 @@ export const Tester = (props: TesterProps) => {
   }
 
   const testUrlAgainstRule = (e: any) => {
-    let urlUnderTest = e.target.value.trim();
+    const urlUnderTest = e.target.value.trim();
     if(urlUnderTest===""){
         setTestResponse(defaultTestResponse);
         return;
     }
-    let resp = getRedirectResponse(props.rule, {url: urlUnderTest});
+    const resp = getRedirectResponse(props.rule, {url: urlUnderTest});
     if(resp===undefined){
         createResponse({testUrl: urlUnderTest})
     } else {
