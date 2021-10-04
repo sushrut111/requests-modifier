@@ -29,7 +29,7 @@ const Options = () => {
   }
 
   const upSyncRules = () => {
-    if(!!!initialized) return;
+    if(!initialized) return;
     chrome.storage.local.set({RArules: rules});
     
   }
@@ -67,8 +67,8 @@ const Options = () => {
   }
   function arrayBufferToBase64(buffer: ArrayBuffer) {
       let binary = '';
-      let bytes = new Uint8Array(buffer);
-      let len = bytes.byteLength;
+      const bytes = new Uint8Array(buffer);
+      const len = bytes.byteLength;
       for (let i = 0; i < len; i++) {
           binary += String.fromCharCode(bytes[i]);
       }
@@ -78,13 +78,13 @@ const Options = () => {
   const handleFileDrop = async(e: any) => {
     e.preventDefault();
     if (e.dataTransfer.items) {
-      for (var i = 0; i < e.dataTransfer.items.length; i++) {
+      for (let i = 0; i < e.dataTransfer.items.length; i++) {
         // If dropped items aren't files, reject them
         if (e.dataTransfer.items[i].kind === 'file') {
-          var file = e.dataTransfer.items[i].getAsFile();
-          let buffer = await file.arrayBuffer();
-          let base64Data = arrayBufferToBase64(buffer);
-          let dataUrl = `data:${file.type};base64,${base64Data}`;
+          const file = e.dataTransfer.items[i].getAsFile();
+          const buffer = await file.arrayBuffer();
+          const base64Data = arrayBufferToBase64(buffer);
+          const dataUrl = `data:${file.type};base64,${base64Data}`;
           setNewRule({
             ...newRule,
             target: dataUrl
@@ -99,8 +99,8 @@ const Options = () => {
   }
 
   const addNewRules = (newrules: Rule[]) => {
-    let validRules = newrules.filter((_irule)=>{
-      let validation = validateRule(_irule);
+    const validRules = newrules.filter((_irule)=>{
+      const validation = validateRule(_irule);
       if(!validation.valid){
         alert(validation.error);
       }
@@ -119,7 +119,7 @@ const Options = () => {
   }
 
   const openRuleTester = () => {
-    let validation = validateRule(newRule);
+    const validation = validateRule(newRule);
     if(!validation.valid){
       alert(validation.error);
       return;
@@ -154,12 +154,12 @@ const Options = () => {
     if(e.target.files.length===0){
       return;
     }
-    let file: File = e.target.files[0];
+    const file: File = e.target.files[0];
     if(!file.name.endsWith(".arjson")) {
       alert("This is not a valid export from this extension.");
       return;
     }
-    let fileText = await file.text();
+    const fileText = await file.text();
     let fileRules;
     try{
       fileRules = JSON.parse(fileText);

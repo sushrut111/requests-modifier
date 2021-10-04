@@ -8,13 +8,13 @@ export interface Rule {
 }
 
 export const validateRule = (rule: Rule) => {
-  let validation = {
+  const validation = {
     valid: true,
     error: ""
   }
   // check for keys
-  let requiredKeys = ["urlpattern", "target", "scheme", "active"];
-  for(let key of requiredKeys){
+  const requiredKeys = ["urlpattern", "target", "scheme", "active"];
+  for(const key of requiredKeys){
     if(!(key in rule)){
       validation.error = `${key} not found in rule`;
       validation.valid = false;
@@ -23,7 +23,7 @@ export const validateRule = (rule: Rule) => {
   }
 
   // validate rule scheme
-  let allowedSchemes = ["REGEX", "EXACT"];
+  const allowedSchemes = ["REGEX", "EXACT"];
   if(!allowedSchemes.includes(rule.scheme)){
     validation.error = `${rule.scheme} is not a valid rule scheme`;
     validation.valid = false;
@@ -57,7 +57,7 @@ export const getRedirectResponse = (thisrule: Rule, requestDetails: {url: string
   } else if(thisrule.scheme === "REGEX") {
     const regexp = new RegExp(`^${thisrule.urlpattern}$`);
     if(regexp.test(requestDetails.url)) {
-      let match = regexp.exec(requestDetails.url);
+      const match = regexp.exec(requestDetails.url);
       return {
         redirectUrl: thisrule.target + (match.length>1?match[match.length-1]:"")
       }

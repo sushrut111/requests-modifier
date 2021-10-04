@@ -1,7 +1,7 @@
 import { Rule, validateRule, getRedirectResponse } from "../src/Rule";
 
 test("A valid rule", () => {
-  let rule: Rule = {
+  const rule: Rule = {
     urlpattern: "https://example.com",
     target: "https://google.com",
     scheme: "EXACT",
@@ -15,7 +15,7 @@ test("A valid rule", () => {
 });
 
 test("An invalid rule with invalid regex", () => {
-  let rule: Rule = {
+  const rule: Rule = {
     urlpattern: "*",
     target: "https://google.com",
     scheme: "REGEX",
@@ -30,8 +30,8 @@ test("An invalid rule with invalid regex", () => {
 
 
 test("Correct redirection with regex", () => {
-  let target = "https://google.com";
-  let rule: Rule = {
+  const target = "https://google.com";
+  const rule: Rule = {
     urlpattern: ".*",
     target: target,
     scheme: "REGEX",
@@ -44,8 +44,8 @@ test("Correct redirection with regex", () => {
 });
 
 test("Correct redirection with exact with unmatching url", () => {
-  let target = "https://google.com";
-  let rule: Rule = {
+  const target = "https://google.com";
+  const rule: Rule = {
     urlpattern: "http://example.com",
     target: target,
     scheme: "EXACT",
@@ -56,9 +56,9 @@ test("Correct redirection with exact with unmatching url", () => {
 });
 
 test("Correct redirection with exact", () => {
-  let target = "https://google.com";
-  let testurl = "http://example.com"
-  let rule: Rule = {
+  const target = "https://google.com";
+  const testurl = "http://example.com"
+  const rule: Rule = {
     urlpattern: "http://example.com",
     target: target,
     scheme: "EXACT",
@@ -71,9 +71,9 @@ test("Correct redirection with exact", () => {
 });
 
 test("Correct redirection with regex and positional params", () => {
-  let target = "https://google.com";
-  let testurl = "http://example.com?name=testname"
-  let rule: Rule = {
+  const target = "https://google.com";
+  const testurl = "http://example.com?name=testname"
+  const rule: Rule = {
     urlpattern: "http://example.com(.*)",
     target: target,
     scheme: "REGEX",

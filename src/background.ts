@@ -24,9 +24,9 @@ const actorFunction = async () => {
   chrome.webRequest.onBeforeRequest.addListener(
     (requestDetails: chrome.webRequest.WebRequestBodyDetails): void | chrome.webRequest.BlockingResponse => {
       for(let i=0; i<rules.length; i++){
-        if(!!!rules[i].active) continue;
-        let thisrule = rules[i];
-        let redirResp = getRedirectResponse(thisrule, requestDetails);
+        if(!rules[i].active) continue;
+        const thisrule = rules[i];
+        const redirResp = getRedirectResponse(thisrule, requestDetails);
         if(redirResp===undefined) continue;
         return redirResp;
       }
