@@ -8,7 +8,8 @@
     "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\""
+    "style": "npx eslint . --ext .ts,.tsx",
+    "style:fix": "npx eslint . --ext .ts,.tsx --fix"
   },
   "author": "",
   "license": "ISC",
@@ -27,9 +28,12 @@
     "@types/jquery": "^3.3.33",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
     "babel-jest": "^26.6.3",
     "copy-webpack-plugin": "^6.1.0",
     "css-loader": "^5.2.6",
+    "eslint": "^7.32.0",
     "glob": "^7.1.6",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
@@ -37,7 +41,7 @@
     "style-loader": "^2.0.0",
     "ts-jest": "^25.2.1 ",
     "ts-loader": "^6.2.1",
-    "typescript": "~3.8.3 ",
+    "typescript": "^3.8.3",
     "webpack": "^4.44.1",
     "webpack-cli": "~3.3.11",
     "webpack-merge": "~4.2.2"
