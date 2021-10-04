@@ -84,3 +84,23 @@ test("Correct redirection with regex and positional params", () => {
     redirectUrl: `${target}?name=testname`
   });
 });
+
+test("Blocked url", () => {
+  const target = "BLOCK";
+  const pattern = ".*";
+  const rule: Rule = {
+    urlpattern: pattern,
+    target: target,
+    scheme: "REGEX",
+    active: true
+  };
+
+  expect(validateRule(rule)).toMatchObject({
+    valid: true,
+    error: "",
+  });
+
+  expect(getRedirectResponse(rule, {
+    url: "https://google.com"
+  })).toMatchObject({cancel: true});
+})
