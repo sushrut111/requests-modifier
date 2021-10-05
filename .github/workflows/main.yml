@@ -42,4 +42,13 @@ jobs:
       name: npm install
     - run: npm test
       name: Run tests
+  Check-AdDomains-Syntax:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'    
+    - run: cat exports/advertiseDomains.json | node -e "console.log( JSON.stringify( JSON.parse(require('fs').readFileSync(0) ), 0, 1 ))"
+      name: Check json file validity
 
