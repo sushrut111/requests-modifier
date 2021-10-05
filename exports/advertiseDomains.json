@@ -354,5 +354,13 @@
     "www.googleadservices.com",
     "www-google-analytics.l.google.com",
     "www-googletagmanager.l.google.com",
-    "www.googletagservices.com"
+    "www.googletagservices.com",
+	"sync.unoadsrv.com",
+	"s.ortb.unoadsrv.com",
+	"static.unoadsrv.com",
+	"us-vast.unoadsrv.com",
+	"vast.unoadsrv.com",
+	"www.bizographics.com",
+	"bizographics.com",
+	"api.bizographics.com",
 ]
