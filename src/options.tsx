@@ -1,14 +1,17 @@
 import React, { isValidElement, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { Container, Table, InputGroup, DropdownButton, Dropdown, FormControl, Button, Tab, Alert, FormCheck } from "react-bootstrap";
+import { Container, Table, InputGroup, DropdownButton, Dropdown, FormControl, Button, Tab, Alert, FormCheck, Row, Col, Form } from "react-bootstrap";
 import { EventKey } from "react-bootstrap/esm/types";
 import * as _ from "lodash";
-import {Rule, ruleSchemeTypes, validateRule} from "./Rule";
+import {HeaderTarget, Rule, ruleSchemeTypes, ruleTypes, validateRule} from "./Rule";
 import {Tester} from "./regexTester";
 import "./extras.css";
 
 const Options = () => {
   const [rules, setRules] = useState<Rule[]>([]);
+  const [ruleType, setRuleType] = useState<ruleTypes>("REQUEST_HEADER");
+  const [currentHeader, setCurrentHeader] = useState<HeaderTarget>({name: "", value: ""})
+  const [headerTargets, setHeaderTargets] = useState<HeaderTarget[]>([]);
   const [showTester, setShowTester] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
   const synchronizeDataSaved = () => {
@@ -19,13 +22,19 @@ const Options = () => {
     });    
   }
 
+  const clearHeaderTargets = () => {
+    setHeaderTargets([]);
+  }
+
   const clearNewRule = () => {
     setNewRule({
       ...newRule,
       urlpattern: "",
       target: "",
-      active: true
-    })
+      active: true,
+
+    });
+    clearHeaderTargets();
   }
 
   const upSyncRules = () => {
@@ -111,7 +120,7 @@ const Options = () => {
   }
 
   const saveRule = () => {
-    if(addNewRules([newRule])) clearNewRule();
+    if(addNewRules([{...newRule, ruleType: ruleType}])) clearNewRule();
   }
 
   const getJsonExportDataUrl = () => {
@@ -218,12 +227,89 @@ const Options = () => {
     rule={newRule}/>
   }
 
+  const handleCurrentHeaderChange = (what: string) => {
+    return (e: any) => {
+      if (what == "key") {
+        setCurrentHeader({...currentHeader, name: e.target.value})
+      } else {
+        setCurrentHeader({...currentHeader, value: e.target.value})
+      }
+    }
+  }
+
+  const clearCurrentHeader = () => {
+    setCurrentHeader({name: "", value: ""})
+  }
+
+  const updateCurrentHeaderTargets = () => {
+    let tempCurrRules = _.concat(headerTargets, currentHeader)
+    setHeaderTargets(tempCurrRules);
+    setNewRule({...newRule, target: JSON.stringify(tempCurrRules)});
+    clearCurrentHeader();
+  }
+
+  const getRedirectRuleForm = () => {
+    return <InputGroup>
+    <FormControl 
+      as="textarea" 
+      aria-label="With textarea" 
+      placeholder="Enter url for redirection. To return contents from a file as response, drag and drop the file in this text area." 
+      value={newRule.target} 
+      onChange={handleTargetChange} 
+      onDrop={handleFileDrop} 
+      onDragOver={dragOverHandler}
+    />
+    <Button onClick={openRuleTester} variant="warning">Test</Button>
+    <Button variant="primary" onClick={saveRule}>Add Rule</Button>
+  </InputGroup>;
+  }
+
+  const getAddRequestHeaderRuleForm = () => {
+    return <><InputGroup>
+        <Row>
+          <Col><FormControl placeholder="Key" value={currentHeader.name} onChange={handleCurrentHeaderChange("key")}></FormControl></Col>
+          <Col><FormControl placeholder="Value" value={currentHeader.value} onChange={handleCurrentHeaderChange("value")}></FormControl></Col>
+          <Col><Button onClick={updateCurrentHeaderTargets}>Add header to this rule</Button></Col>
+        </Row>
+    </InputGroup>
+    {/* <hr/> */}
+    Currently added headers: <div>{JSON.stringify(headerTargets)}</div>
+    <hr/>
+    <Button onClick={saveRule}>Save rule</Button>
+    </>
+  }
+
+  const toggleRuleType = () => {
+    if (ruleType === "REDIRECT") {
+      setRuleType("REQUEST_HEADER");
+    } else {
+      setRuleType("REDIRECT");
+    }
+  }
+
+  const getRuleTypeSwitchPosition = () => {
+    if (ruleType === "REDIRECT") return false;
+    return true;
+  }
+
+  const getRuleToggleSwitchLabel = () => {
+    return getRuleTypeSwitchPosition()?"Request header rule": "Redirect rule"
+  }
+
   return (
     <>
 <div>
   <Container>
     {getRuleTesterModal()}
     <div style={{textAlign: "center"}}><h2>Autoresponder</h2></div>
+    <hr/>
+    You are adding rule to {getRuleTypeSwitchPosition()?"Add request header":"Redirect"}. Use the switch below to change that!
+    <FormCheck 
+      type="switch" 
+      checked={getRuleTypeSwitchPosition()} 
+      id="custom" onChange={toggleRuleType} 
+      label={getRuleToggleSwitchLabel()}/>
+    <hr/>
     <div>
       <InputGroup>
         <DropdownButton
@@ -238,19 +324,7 @@ const Options = () => {
         </DropdownButton>
         <FormControl placeholder="URL to be matched" value={newRule.urlpattern} onChange={handleUrlPatternChange}/>
       </InputGroup>
-      <InputGroup>
-        <FormControl 
-          as="textarea" 
-          aria-label="With textarea" 
-          placeholder="Enter url for redirection. To return contents from a file as response, drag and drop the file in this text area." 
-          value={newRule.target} 
-          onChange={handleTargetChange} 
-          onDrop={handleFileDrop} 
-          onDragOver={dragOverHandler}
-        />
-        <Button onClick={openRuleTester} variant="warning">Test</Button>
-        <Button variant="primary" onClick={saveRule}>Add Rule</Button>
-      </InputGroup>
+      {getRuleTypeSwitchPosition()?getAddRequestHeaderRuleForm():getRedirectRuleForm()}
       <hr/>
     </div>
     <div>
@@ -261,6 +335,7 @@ const Options = () => {
           <th>#</th>
           <th>Scheme</th>
           <th>UrlPattern</th>
+          <th>Ruletype</th>
           <th>Target</th>
           <th>Active</th>
           <th>Action</th>
@@ -274,6 +349,7 @@ const Options = () => {
                 <td>{index + 1}</td>
                 <td>{rule.scheme}</td>
                 <td>{rule.urlpattern}</td>
+                <td>{rule.ruleType??"REDIRECT"}</td>
                 <td className="wrappedHidden">{rule.target}</td>
                 <td><FormCheck type="checkbox" checked={rule.active} onChange={()=>toggleChecked(rule)}/></td>
                 <td><Button size="sm" variant="warning" onClick={()=>editRule(rule)} >Edit</Button><Button size="sm" variant="danger" onClick={()=>{removeRule(rule)}}>Delete</Button></td>
