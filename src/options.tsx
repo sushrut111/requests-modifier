@@ -242,7 +242,7 @@ const Options = () => {
   }
 
   const updateCurrentHeaderTargets = () => {
-    let tempCurrRules = _.concat(headerTargets, currentHeader)
+    const tempCurrRules = _.concat(headerTargets, currentHeader)
     setHeaderTargets(tempCurrRules);
     setNewRule({...newRule, target: JSON.stringify(tempCurrRules)});
     clearCurrentHeader();
