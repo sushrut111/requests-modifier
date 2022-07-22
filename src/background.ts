@@ -1,4 +1,4 @@
-import {Rule, getRedirectResponse} from "./Rule";
+import {Rule, getRedirectResponse, GenericRule, RedirectRule, AddRequestHeaderRule} from "./Rule";
 const synchronizeDataSaved = (): Promise<Rule[]> => {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get("RArules", (data: any) => {
@@ -21,12 +21,33 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 const actorFunction = async () => {
   
+  chrome.webRequest.onBeforeSendHeaders.addListener(
+    (requestDetails: chrome.webRequest.WebRequestHeadersDetails): void | chrome.webRequest.BlockingResponse => {
+      for(let i=0; i<rules.length; i++){
+        if(rules[i].ruleType !== "REQUEST_HEADER") {
+          continue;
+        }
+        if(!rules[i].active) continue;
+        const thisrule = new AddRequestHeaderRule(rules[i]);
+        const returnHeaders = thisrule.getRuleOutput(requestDetails);
+        if(returnHeaders===undefined) continue;
+        return returnHeaders;
+      }
+    }, 
+    {
+      urls: ["<all_urls>"]
+    },
+    ["blocking"]
+  );
+
   chrome.webRequest.onBeforeRequest.addListener(
     (requestDetails: chrome.webRequest.WebRequestBodyDetails): void | chrome.webRequest.BlockingResponse => {
       for(let i=0; i<rules.length; i++){
+        // undefined check if for backward compatibility
+        if (rules[i].ruleType !== "REDIRECT" && rules[i].ruleType !== undefined) continue;
         if(!rules[i].active) continue;
-        const thisrule = rules[i];
-        const redirResp = getRedirectResponse(thisrule, requestDetails);
+        const thisrule = new RedirectRule(rules[i]);
+        const redirResp = thisrule.getRuleOutput(requestDetails);
         if(redirResp===undefined) continue;
         return redirResp;
       }
