@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {Rule, getRedirectResponse, GenericRule, RedirectRule, AddRequestHeaderRule} from "./Rule";
 const synchronizeDataSaved = (): Promise<Rule[]> => {
   return new Promise((resolve, reject) => {
@@ -31,13 +32,17 @@ const actorFunction = async () => {
         const thisrule = new AddRequestHeaderRule(rules[i]);
         const returnHeaders = thisrule.getRuleOutput(requestDetails);
         if(returnHeaders===undefined) continue;
-        return returnHeaders;
+        let finalHeaders: chrome.webRequest.BlockingResponse = { requestHeaders: [] };
+        if(requestDetails.requestHeaders!==undefined){
+          finalHeaders.requestHeaders = _.concat(requestDetails.requestHeaders, returnHeaders.requestHeaders)
+        }
+        return finalHeaders;
       }
     }, 
     {
       urls: ["<all_urls>"]
     },
-    ["blocking"]
+    ["blocking", "requestHeaders"]
   );
 
   chrome.webRequest.onBeforeRequest.addListener(
