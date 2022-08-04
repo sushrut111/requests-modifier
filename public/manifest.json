@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "AutoResponder Chrome",
-  "description": "Catch the requests and return response from other urls or local files, block ads",
-  "version": "1.5",
+  "description": "Catch the requests and return response from other urls or local files, block ads, inject request headers.",
+  "version": "2.1",
 
   "options_ui": {
     "page": "options.html",
