@@ -32,7 +32,7 @@ const actorFunction = async () => {
         const thisrule = new AddRequestHeaderRule(rules[i]);
         const returnHeaders = thisrule.getRuleOutput(requestDetails);
         if(returnHeaders===undefined) continue;
-        let finalHeaders: chrome.webRequest.BlockingResponse = { requestHeaders: [] };
+        const finalHeaders: chrome.webRequest.BlockingResponse = { requestHeaders: [] };
         if(requestDetails.requestHeaders!==undefined){
           finalHeaders.requestHeaders = _.concat(requestDetails.requestHeaders, returnHeaders.requestHeaders)
         }
