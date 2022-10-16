@@ -10,8 +10,7 @@ interface TesterProps {
 
 interface TestCase {
   testUrl: string,
-  responseUrl?: string,
-  cancelled?: boolean
+  response: chrome.webRequest.BlockingResponse
 }
 
 export const Tester = (props: TesterProps) => {
@@ -22,14 +21,15 @@ export const Tester = (props: TesterProps) => {
     if (testcase.testUrl === "") {
       setTestResponse(defaultTestResponse);
     }
-    if (!testcase.responseUrl && !testcase.cancelled) {
+    if (!testcase.response || testcase.response === undefined) {
       setTestResponse(
         <Alert variant="danger">
           The test url {testcase.testUrl} does not satisfy this rule.
             </Alert>
       )
-    } else {
-      if (testcase.cancelled) {
+    }
+    else {
+      if (testcase.response.cancel) {
         setTestResponse(
           <Alert variant="primary">
             All requests to {testcase.testUrl}<br />
@@ -39,13 +39,26 @@ export const Tester = (props: TesterProps) => {
         )
 
       } else {
-        setTestResponse(
-          <Alert variant="primary">
-            All requests to {testcase.testUrl}<br />
-                will get their response from <br />
-            <a href={testcase.responseUrl} target="_blank" className="wrappedHidden" >{testcase.responseUrl}</a>
+        if (getRuleObject(props.rule).ruleType == "REDIRECT") {
+          setTestResponse(
+            <Alert variant="primary">
+              All requests to {testcase.testUrl}<br />
+                  will get their response from <br />
+              <a href={testcase.response.redirectUrl} target="_blank" className="wrappedHidden" >{testcase.response.redirectUrl}</a>
+            </Alert>
+          )
+        } else if (getRuleObject(props.rule).ruleType == "REQUEST_HEADER") {
+          setTestResponse(
+            <Alert variant="primary">
+            For all requests to {testcase.testUrl}<br />
+            the headers {JSON.stringify(testcase.response.requestHeaders)} will be appended to outgoing request <br />
+            this is in addition to the existing headers on the request
           </Alert>
-        )
+
+          );
+        } else {
+          alert(`RuleType ${props.rule.ruleType} is not recognized!`)
+        }
       }
     }
   }
@@ -57,13 +70,7 @@ export const Tester = (props: TesterProps) => {
       return;
     }
     const resp = getRuleObject(props.rule).getRuleOutput({ url: urlUnderTest });
-    if (resp === undefined) {
-      createResponse({ testUrl: urlUnderTest })
-    } else if (resp.cancel) {
-      createResponse({ testUrl: urlUnderTest, cancelled: true })
-    } else {
-      createResponse({ testUrl: urlUnderTest, responseUrl: resp.redirectUrl })
-    }
+    createResponse({ testUrl: urlUnderTest, response: resp })
   }
 
   return (
@@ -82,6 +89,7 @@ export const Tester = (props: TesterProps) => {
         <Table>
           <tbody>
             <tr><td>Scheme</td><td>{props.rule.scheme}</td></tr>
+            <tr><td>Rule type</td><td>{getRuleObject(props.rule).ruleType}</td></tr>
             <tr><td>Match pattern</td><td>{props.rule.urlpattern}</td></tr>
             <tr><td>Target</td><td className="wrappedHidden">{props.rule.target}</td></tr>
           </tbody>

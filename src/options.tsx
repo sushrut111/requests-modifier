@@ -14,6 +14,8 @@ const Options = () => {
   const [headerTargets, setHeaderTargets] = useState<HeaderTarget[]>([]);
   const [showTester, setShowTester] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
+  const [newRule, setNewRule] = useState<Rule>({urlpattern:"", target:"", scheme: "REGEX", active: true, ruleType: ruleType });
+
   const synchronizeDataSaved = () => {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get("RArules", (data: any) => {
@@ -50,10 +52,8 @@ const Options = () => {
 
   useEffect(()=>{
     upSyncRules();
-  }, [rules])
-  
-  const [newRule, setNewRule] = useState<Rule>({urlpattern:"", target:"", scheme: "REGEX", active: true});
-  
+  }, [rules]);  
+
   const handleUrlSchemeChange = (eventKey: ruleSchemeTypes) => {
     setNewRule({
       ...newRule,
@@ -128,7 +128,6 @@ const Options = () => {
   }
 
   const openRuleTester = () => {
-    newRule.ruleType = ruleType;
     const validation = getRuleObject(newRule).validateRule();
     if(!validation.valid){
       alert(validation.error);
@@ -276,8 +275,16 @@ const Options = () => {
   const toggleRuleType = () => {
     if (ruleType === "REDIRECT") {
       setRuleType("REQUEST_HEADER");
+      setNewRule({
+        ...newRule,
+        ruleType: "REQUEST_HEADER"
+      });
     } else {
       setRuleType("REDIRECT");
+      setNewRule({
+        ...newRule,
+        ruleType: "REDIRECT"
+      });
     }
   }
 
