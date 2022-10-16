@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import {HeaderTarget, Rule, ruleSchemeTypes, ruleTypes, validateRule} from "./Rule";
 import {Tester} from "./regexTester";
 import "./extras.css";
+import Instructions from "./instructions";
 
 const Options = () => {
   const [rules, setRules] = useState<Rule[]>([]);
@@ -192,15 +193,7 @@ const Options = () => {
   const getInstructions = () => {
     return <Alert variant="primary">
       <ul>
-        <li>You can add and delete rules from autoresponder here.</li>
-        <li>Select the match scheme for rule. Select EXACT to match the url exactly, select REGEX to enter a pattern.</li>
-        <li>Enter the exact url or regular expression in the input field "URL to be matched"</li>
-        <li>In the next input field, you can either enter the url where you want the response to be fetched from or drag and drop the file to return the contents of that file as response.</li>
-        <li>The last matched group will be appended to the redirected URL by default. If you do not want to append the last match, write your regular expression such that there are no match groups.</li>
-        <li>Click on Add rule to save the rule.</li>
-        <li>You can edit the saved rule by clicking the edit button. This will delete the saved rule and the rule will be added to the edit session - that means you will <b>lose the rule</b> if you navigate away without saving it.</li>
-        <li>You can export the rules by clicking the Export rules button below the table.</li>
-        <li>You can import the rules by clicking the Import rules button below the table and then selecting the .arjson file exported.</li>
+        {Instructions.map(x => <li>{x}</li>)}
       </ul>
     </Alert>
   }
