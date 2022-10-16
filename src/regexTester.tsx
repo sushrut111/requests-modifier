@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Button, Container, FormControl, Modal, Table } from "react-bootstrap";
-import { getRedirectResponse, Rule } from "./Rule";
+import { Alert, Button, FormControl, Modal, Table } from "react-bootstrap";
+import { getRuleObject, Rule } from "./Rule";
 import "./extras.css"
 interface TesterProps {
   show: boolean,
@@ -56,7 +56,7 @@ export const Tester = (props: TesterProps) => {
       setTestResponse(defaultTestResponse);
       return;
     }
-    const resp = getRedirectResponse(props.rule, { url: urlUnderTest });
+    const resp = getRuleObject(props.rule).getRuleOutput({ url: urlUnderTest });
     if (resp === undefined) {
       createResponse({ testUrl: urlUnderTest })
     } else if (resp.cancel) {
