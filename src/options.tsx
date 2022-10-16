@@ -1,9 +1,8 @@
-import React, { isValidElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { Container, Table, InputGroup, DropdownButton, Dropdown, FormControl, Button, Tab, Alert, FormCheck, Row, Col, Form } from "react-bootstrap";
-import { EventKey } from "react-bootstrap/esm/types";
 import * as _ from "lodash";
-import {HeaderTarget, Rule, ruleSchemeTypes, ruleTypes, validateRule} from "./Rule";
+import {getRuleObject, HeaderTarget, Rule, ruleSchemeTypes, ruleTypes} from "./Rule";
 import {Tester} from "./regexTester";
 import "./extras.css";
 import Instructions from "./instructions";
@@ -110,7 +109,7 @@ const Options = () => {
 
   const addNewRules = (newrules: Rule[]) => {
     const validRules = newrules.filter((_irule)=>{
-      const validation = validateRule(_irule);
+      const validation = getRuleObject(_irule).validateRule();
       if(!validation.valid){
         alert(validation.error);
       }
@@ -129,7 +128,8 @@ const Options = () => {
   }
 
   const openRuleTester = () => {
-    const validation = validateRule(newRule);
+    newRule.ruleType = ruleType;
+    const validation = getRuleObject(newRule).validateRule();
     if(!validation.valid){
       alert(validation.error);
       return;
@@ -268,6 +268,7 @@ const Options = () => {
     {/* <hr/> */}
     Currently added headers: <div>{JSON.stringify(headerTargets)}</div>
     <hr/>
+    <Button variant="warning" onClick={openRuleTester}>Test rule</Button>
     <Button onClick={saveRule}>Save rule</Button>
     </>
   }

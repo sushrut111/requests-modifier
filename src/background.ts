@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {Rule, getRedirectResponse, GenericRule, RedirectRule, AddRequestHeaderRule} from "./Rule";
+import {Rule, RedirectRule, AddRequestHeaderRule} from "./Rule";
 const synchronizeDataSaved = (): Promise<Rule[]> => {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get("RArules", (data: any) => {
@@ -10,6 +10,7 @@ const synchronizeDataSaved = (): Promise<Rule[]> => {
 
 let rules: Rule[] = [];
 synchronizeDataSaved().then(syncRules => {
+  console.log(syncRules);
   rules = syncRules;
 });
 
