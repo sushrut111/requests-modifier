@@ -114,3 +114,52 @@ test("Blocked url", () => {
 
   expect(getRuleObject(rule).getRuleOutput(reqeust)).toMatchObject({cancel: true});
 })
+
+test("GetRuleObject Returns correct object with backward compatibility", () => {
+  const target = "https://google.com";
+  const rule: Rule = {
+    urlpattern: "http://example.com(.*)",
+    target: target,
+    scheme: "REGEX",
+    active: true,
+  };
+  const ruleObject = getRuleObject(rule);
+  expect(ruleObject.ruleType).toMatch("REDIRECT");
+});
+
+test("GetRuleObject Returns correct object for redirect rule", () => {
+  const target = "https://google.com";
+  const rule: Rule = {
+    urlpattern: "http://example.com(.*)",
+    target: target,
+    scheme: "REGEX",
+    active: true,
+    ruleType: "REDIRECT"
+  };
+  const ruleObject = getRuleObject(rule);
+  expect(ruleObject.ruleType).toMatch("REDIRECT");
+});
+
+test("GetRuleObject Returns correct object with backward compatibility", () => {
+  const target = '[{"name":"x-ms-test","value":"sometest"}]';
+  const rule: Rule = {
+    urlpattern: "http://example.com(.*)",
+    target: target,
+    scheme: "REGEX",
+    active: true,
+    ruleType: "REQUEST_HEADER"
+  };
+  const ruleObject = getRuleObject(rule);
+  expect(ruleObject.ruleType).toMatch("REQUEST_HEADER");
+});
+
+test("GetRuleOutput call on generic class throws error", () => {
+  const rule : GenericRule = new GenericRule();
+
+  rule.urlpattern = "http://example.com(.*)",
+  rule.target = "https://example.com",
+  rule.scheme = "REGEX",
+  rule.active = true,
+
+  expect(() => { rule.getRuleOutput({ url: 'https://google.com' }) }).toThrow("Invalid call for method getRuleOutput on GenericRule class. This method call should be on the concrete rule class.");
+});
