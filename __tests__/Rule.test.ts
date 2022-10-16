@@ -38,7 +38,7 @@ test("Correct redirection with regex", () => {
     active: true,
   };
 
-  let request = {url: "https://facebook.com"};
+  const request = {url: "https://facebook.com"};
 
   expect(getRuleObject(rule).getRuleOutput(request)).toMatchObject({
     redirectUrl: target
@@ -54,7 +54,7 @@ test("Correct redirection with exact with unmatching url", () => {
     active: true,
   };
 
-  let request = {url: "https://facebook.com"};
+  const request = {url: "https://facebook.com"};
 
   expect(getRuleObject(rule).getRuleOutput(request)).toBeUndefined();
 });
@@ -69,7 +69,7 @@ test("Correct redirection with exact", () => {
     active: true,
   };
 
-  let request = {url: testurl};
+  const request = {url: testurl};
 
   expect(getRuleObject(rule).getRuleOutput(request)).toMatchObject({
     redirectUrl: target
@@ -86,7 +86,7 @@ test("Correct redirection with regex and positional params", () => {
     active: true,
   };
 
-  let request = {url: testurl};
+  const request = {url: testurl};
 
   expect(getRuleObject(rule).getRuleOutput(request)).toMatchObject({
     redirectUrl: `${target}?name=testname`
@@ -108,7 +108,7 @@ test("Blocked url", () => {
     error: "",
   });
 
-  let reqeust = {
+  const reqeust = {
     url: "https://google.com"
   };
 
