@@ -1,4 +1,4 @@
-import { Rule, validateRule, getRedirectResponse } from "../src/Rule";
+import { Rule, getRuleObject, GenericRule } from "../src/Rule";
 
 test("A valid rule", () => {
   const rule: Rule = {
@@ -8,7 +8,7 @@ test("A valid rule", () => {
     active: true,
   };
 
-  expect(validateRule(rule)).toMatchObject({
+  expect(getRuleObject(rule).validateRule()).toMatchObject({
     valid: true,
     error: "",
   });
@@ -22,7 +22,7 @@ test("An invalid rule with invalid regex", () => {
     active: true,
   };
 
-  expect(validateRule(rule)).toMatchObject({
+  expect(getRuleObject(rule).validateRule()).toMatchObject({
     valid: false,
     error: "* is not valid regex: SyntaxError: Invalid regular expression: /*/: Nothing to repeat",
   });
@@ -38,7 +38,9 @@ test("Correct redirection with regex", () => {
     active: true,
   };
 
-  expect(getRedirectResponse(rule, {url: "https://facebook.com"})).toMatchObject({
+  let request = {url: "https://facebook.com"};
+
+  expect(getRuleObject(rule).getRuleOutput(request)).toMatchObject({
     redirectUrl: target
   });
 });
@@ -52,7 +54,9 @@ test("Correct redirection with exact with unmatching url", () => {
     active: true,
   };
 
-  expect(getRedirectResponse(rule, {url: "https://facebook.com"})).toBeUndefined();
+  let request = {url: "https://facebook.com"};
+
+  expect(getRuleObject(rule).getRuleOutput(request)).toBeUndefined();
 });
 
 test("Correct redirection with exact", () => {
@@ -65,7 +69,9 @@ test("Correct redirection with exact", () => {
     active: true,
   };
 
-  expect(getRedirectResponse(rule, {url: testurl})).toMatchObject({
+  let request = {url: testurl};
+
+  expect(getRuleObject(rule).getRuleOutput(request)).toMatchObject({
     redirectUrl: target
   });
 });
@@ -80,7 +86,9 @@ test("Correct redirection with regex and positional params", () => {
     active: true,
   };
 
-  expect(getRedirectResponse(rule, {url: testurl})).toMatchObject({
+  let request = {url: testurl};
+
+  expect(getRuleObject(rule).getRuleOutput(request)).toMatchObject({
     redirectUrl: `${target}?name=testname`
   });
 });
@@ -95,12 +103,14 @@ test("Blocked url", () => {
     active: true
   };
 
-  expect(validateRule(rule)).toMatchObject({
+  expect(getRuleObject(rule).validateRule()).toMatchObject({
     valid: true,
     error: "",
   });
 
-  expect(getRedirectResponse(rule, {
+  let reqeust = {
     url: "https://google.com"
-  })).toMatchObject({cancel: true});
+  };
+
+  expect(getRuleObject(rule).getRuleOutput(reqeust)).toMatchObject({cancel: true});
 })
